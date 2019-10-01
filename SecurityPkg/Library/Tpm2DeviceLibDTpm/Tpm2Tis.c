@@ -97,6 +97,7 @@ TisPcReadBurstCount (
   )
 {
   UINT32                            WaitTime;
+  UINTN                             BurstCountAddress;    // MU_CHANGE
   UINT8                             DataByte0;
   UINT8                             DataByte1;
 
@@ -110,8 +111,13 @@ TisPcReadBurstCount (
     // TIS_PC_REGISTERS_PTR->burstCount is UINT16, but it is not 2bytes aligned,
     // so it needs to use MmioRead8 to read two times
     //
-    DataByte0   = MmioRead8 ((UINTN)&TisReg->BurstCount);
-    DataByte1   = MmioRead8 ((UINTN)&TisReg->BurstCount + 1);
+    // MU_CHANGE [BEGIN] - The size of the BurstCount field is UINT16, so the pointer + 1
+    //                     increments to the wrong address. Is there a reason this wasn't
+    //                     done with ReadUnaligned16()?
+    BurstCountAddress = (UINTN)&TisReg->BurstCount;
+    DataByte0   = MmioRead8 (BurstCountAddress);
+    DataByte1   = MmioRead8 (BurstCountAddress + 1);
+    // MU_CHANGE [END]
     *BurstCount = (UINT16)((DataByte1 << 8) + DataByte0);
     if (*BurstCount != 0) {
       return EFI_SUCCESS;
