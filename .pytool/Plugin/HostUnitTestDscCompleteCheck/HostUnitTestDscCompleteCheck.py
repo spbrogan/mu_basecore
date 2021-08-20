@@ -70,7 +70,7 @@ class HostUnitTestDscCompleteCheck(ICiBuildPlugin):
         if abs_dsc_path is None or wsr_dsc_path == "" or not os.path.isfile(abs_dsc_path):
             tc.SetSkipped()
             tc.LogStdError("Package Host Unit Test Dsc not found")
-            return 0
+            return -1
 
         # Get INF Files
         INFFiles = self.WalkDirectoryForExtension([".inf"], abs_pkg_path)
